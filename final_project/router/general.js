@@ -18,26 +18,69 @@ public_users.get('/',function (req, res) {
 
 // Get book details based on ISBN
 public_users.get('/isbn/:isbn',function (req, res) {
-  //Write your code here
-  return res.status(300).json({message: "Yet to be implemented"});
+
+  const isbn = req.params.isbn;
+  
+  const book = books[isbn];
+  
+    if(book){
+      res.status(200).json(book);
+    } else {
+      res.status(404).json({message: "Book Not Found"});
+    }
+
  });
   
 // Get book details based on author
 public_users.get('/author/:author',function (req, res) {
-  //Write your code here
-  return res.status(300).json({message: "Yet to be implemented"});
+  
+  const author = decodeURIComponent(req.params.author);
+  
+  let filteredBooks = [];
+  const keys= Object.keys(books);
+
+    keys.forEach((key)=> {
+      if (books[key].author.toLowerCase() === author.toLowerCase()) {
+        filteredBooks.push({isbn : key, ...books[key]});
+      }
+    });
+     if (filteredBooks.length > 0) {
+        res.status(200).json(filteredBooks);
+    } else {
+        res.status(404).json({ message: "No books found for this     author" });
+    }
 });
 
 // Get all books based on title
 public_users.get('/title/:title',function (req, res) {
-  //Write your code here
-  return res.status(300).json({message: "Yet to be implemented"});
+  
+  const title = decodeURIComponent(req.params.title);
+  
+  const keys = Object.keys(books);
+  let filteredBooks =[];
+  
+
+  keys.forEach((key)=> {
+    if (books[key].title.toLowerCase() === title.toLowerCase()){
+      filteredBooks.push({ isbn : key, ...books[key] });
+    }
+  });
+  if (filteredBooks.length > 0){
+    res.status(200).json(filteredBooks);
+  } else {
+    res.status(404).json({ message : "No BOoks Found with this title."})
+  }
 });
 
 //  Get book review
 public_users.get('/review/:isbn',function (req, res) {
-  //Write your code here
-  return res.status(300).json({message: "Yet to be implemented"});
+  const isbn = req.params.isbn;
+  const book = books[isbn];
+  if(book){
+    res.status(200).json(book.reviews);
+  }else{
+    res.status(404).json({message: "Book not Found"});
+  }
 });
 
 module.exports.general = public_users;
