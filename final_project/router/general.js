@@ -3,6 +3,7 @@ let books = require("./booksdb.js");
 let isValid = require("./auth_users.js").isValid;
 let users = require("./auth_users.js").users;
 const public_users = express.Router();
+const axios = require('axios');
 
 
 public_users.post("/register", (req, res) => {
@@ -23,6 +24,58 @@ public_users.post("/register", (req, res) => {
 
   return res.status(201).json({ message: "User successfully registered" });
 });
+
+
+public_users.get('/async/books', async (req, res) => {
+  try {
+    const response = await axios.get('http://localhost:5000/');
+    res.json(response.data);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+public_users.get('/async/isbn/:isbn', async (req, res) => {
+  const isbn = req.params.isbn;
+  const endpoint = `http://localhost:5000/isbn/${isbn}`;
+  
+  try {
+    const response = await axios.get(endpoint);
+    res.json(response.data);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+public_users.get("/async/author/:author", async (req, res)=> {
+  const author = encodeURIComponent(req.params.author);
+  const endpoint = `http://localhost:5000/author/${author}`;
+  
+  try {
+    const response = await axios.get(endpoint);
+    res.json(response.data);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+
+})
+
+public_users.get("/async/title/:title", async (req, res)=> {
+  const title = encodeURIComponent(req.params.title);
+  const endpoint = `http://localhost:5000/title/${title}`;
+  
+  try {
+    const response = await axios.get(endpoint);
+    res.json(response.data);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+
+})
+
+
+
+
 
 
 // Get the book list available in the shop

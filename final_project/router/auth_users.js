@@ -14,7 +14,7 @@ const authenticatedUser = (username,password)=>{
 }
 
 
-//Debug Rout for Knowing whic user are registred
+//Debug Rout for Knowing which user are registred
 regd_users.get("/debug/users", (req, res) => {
   res.json(users);
 });
@@ -54,6 +54,26 @@ regd_users.put("/auth/review/:isbn", (req, res) => {
   books[isbn].reviews[username] = review;
   return res.status(200).json({ message: "Review added/updated", reviews: books[isbn].reviews });
 });
+
+regd_users.delete("/auth/review/:isbn", (req, res) =>{
+  const isbn = req.params.isbn;
+  const username = req.session.authorization && req.session.authorization.username;
+
+   if (!username) {
+    return res.status(401).json({ message: "User NOT AUTHENTICATED" });
+  }
+  if (!books[isbn]) {
+    return res.status(404).json({ message: "Book NOT FOUND" });
+  }
+  if (books[isbn].reviews && books[isbn].reviews[username]) {
+    delete books[isbn].reviews[username];
+    return res.status(200).json({ message: "Review deleted", reviews: books[isbn].reviews });
+  } else {
+    return res.status(404).json({ message: "No review found for this user" });
+  }
+})
+
+
 
 module.exports.authenticated = regd_users;
 module.exports.isValid = isValid;
